@@ -1,0 +1,118 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: rewear-backend
+  
+  profiles:
+    active: dev
+  
+  datasource:
+    url: jdbc:h2:mem:rewear_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Custom application properties
+app:
+  cors:
+    allowed-origins: "http://localhost:3000,http://localhost:3001"
+  
+  jwt:
+    secret: ${JWT_SECRET:mySecretKey}
+    expiration: 86400000 # 24 hours
+  
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:rewear-platform}
+    private-key: ${FIREBASE_PRIVATE_KEY:}
+    client-email: ${FIREBASE_CLIENT_EMAIL:}
+  
+  file-upload:
+    upload-dir: ${HOME}/rewear-uploads
+    max-file-size: 10MB
+  
+  points:
+    welcome-bonus: 100
+    item-upload-reward: 10
+    successful-swap-reward: 20
+
+# Logging configuration
+logging:
+  level:
+    com.rewear: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+---
+# Production profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/rewear_prod}
+    username: ${DB_USERNAME:rewear_user}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    com.rewear: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
